@@ -1,16 +1,17 @@
-# A Multi-Layer Perceptron for Image Classification
+# A Multi-Layer Perceptron for Image Classification using MNIST/Fashion-MNIST Datasets
 
 ## Overview
 
-This aim is to implement a neural network from scratch using only NumPy. Here I have built all components including layers, activations, optimizers, and loss functions, then train the network on MNIST and Fashion-MNIST datasets.
+The aim of this project is to implement a neural network **from scratch using only NumPy**.  
+All core components are built manually, including layers, activation functions, optimizers, and loss functions.  
+The model is trained and evaluated on the **MNIST** and **Fashion-MNIST** datasets.
 
-## Learning Objectives are:
+Link to W&B Report:  
+[View the experiment report](https://wandb.ai/your-username/project-name/reports/your-report)
 
-- To nderstand forward and backward propagation
-- To implement gradient computation manually
-- To implement various optimizers (SGD, Momentum, Adam, Nadam)
-- To work with activation functions and their derivatives
-- To train and evaluate neural networks
-- To log experiments using Weights & Biases
+## Repository
 
-## Thank you !
+Link to GitHub Repository:  
+[View the source code](https://github.com/your-username/your-repo-name)
+
+## Thank You!
