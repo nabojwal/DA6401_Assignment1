@@ -44,8 +44,10 @@ Run the following command for training with the best hyperparameters.
 ```markdown
 ```bash
 python -m src.train -d mnist -e 10 -b 64 -lr 0.001 -o adam -nhl 3 -sz 128 128 128 -a relu -l cross_entropy -wi xavier
+```
 
 ## Thank You!
+
 
 
 
