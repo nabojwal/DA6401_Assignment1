@@ -1,11 +1,12 @@
 import argparse
 import numpy as np
 import json
+import wandb
 
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 
-from src.utils.data_loader import load_data
-from src.ann.neural_network import NeuralNetwork
+from utils.data_loader import load_data
+from ann.neural_network import NeuralNetwork
 
 
 def parse_arguments():
@@ -22,40 +23,52 @@ def parse_arguments():
     """
     parser = argparse.ArgumentParser(description="Model Inference")
 
-    parser.add_argument("-d", "--dataset", type=str, required=True,
-                        choices=["mnist", "fashion_mnist"])
+    parser.add_argument("-d", "--dataset", type=str,
+                        choices=["mnist", "fashion_mnist"], default="mnist")
 
-    parser.add_argument("--model_path", type=str, required=True)
+    parser.add_argument("-e", "--epochs", type=int, default=10)
 
-    parser.add_argument("--config_path", type=str, required=True)
+    parser.add_argument("-b", "--batch_size", type=int, default=64)
+
+    parser.add_argument("-lr", "--learning_rate", type=float, default= 0.001)
+
+    parser.add_argument("-o", "--optimizer", type=str,
+                        choices=["sgd", "momentum", "nag", "rmsprop", "adam", "nadam"], default="adam")
+
+    parser.add_argument("-nhl", "--num_layers", type=int, default=3)
+
+    parser.add_argument("-sz", "--hidden_size", type=int, nargs="+", default=[128, 128, 128])
+
+    parser.add_argument("-a", "--activation", type=str,
+                        choices=["relu", "sigmoid", "tanh"], default="relu")
+
+    parser.add_argument("-l", "--loss", type=str,
+                        choices=["cross_entropy", "mse"], default="cross_entropy")
+
+    parser.add_argument("-wi", "--weight_init", type=str,
+                        choices=["random", "zeros", "xavier"], default="xavier")
+
+    parser.add_argument("-wd", "--weight_decay", type=float, default=0.0)
+
+    parser.add_argument("--model_path", type=str,
+                        default="src/best_model.npy")
 
     return parser.parse_args()
 
-
-def main():
+def load_model(model_path):
     """
     Load trained model from disk.
     """
-    args = parse_arguments()
+    data = np.load(model_path, allow_pickle=True).item()
+    return data
 
-    with open(args.config_path, "r") as f:
-        config = json.load(f)
-
-    from types import SimpleNamespace
-    config = SimpleNamespace(**config)
-
-    _, _, _, _, X_test, y_test = load_data(args.dataset)
-
-    model = NeuralNetwork(config)
-
-    weights = np.load(args.model_path, allow_pickle=True)
-
-    for layer, saved_layer in zip(model.layers, weights):
-        layer.W = saved_layer["W"]
-        layer.b = saved_layer["b"]
-
+def evaluate_model(model, X_test, y_test): 
+    """
+    Evaluate model on test data.
+        
+    TODO: Return Dictionary - logits, loss, accuracy, f1, precision, recall
+    """
     logits = model.forward(X_test)
-
     predictions = np.argmax(logits, axis=1)
     true_labels = np.argmax(y_test, axis=1)
 
@@ -68,6 +81,41 @@ def main():
     print(f"Precision: {precision:.4f}")
     print(f"Recall: {recall:.4f}")
     print(f"F1-score: {f1:.4f}")
+
+    metrics = {
+    "logits": X_test,
+    "Accuracy": round(acc, 4),
+    "Precision": round(precision, 4),
+    "Recall": round(recall, 4),
+    "F1-score": f1  
+    }
+
+    return metrics
+
+def main():
+    """
+    Load trained model from disk.
+    """
+    args = parse_arguments()
+
+    wandb.init(
+        project="da6401_assignment_1_inference",
+        config=vars(args),
+        mode="offline"  # change to "offline" if internet slow
+    )
+
+    config = wandb.config
+    _, _, _, _, X_test, y_test = load_data(args.dataset)
+
+    model = NeuralNetwork(config)
+
+    weights = load_model(args.model_path)
+
+    model.set_weights(weights)
+
+    result = evaluate_model(model, X_test, y_test)
+
+    return result
 
 
 if __name__ == "__main__":
