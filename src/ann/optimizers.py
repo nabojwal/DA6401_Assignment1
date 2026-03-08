@@ -16,12 +16,8 @@ class SGD:
 
     def step(self):
         for layer in self.layers:
-            for i in range(layer.W.shape[0]):
-                for j in range(layer.W.shape[1]):
-                    layer.W[i][j] = layer.W[i][j] - self.lr * layer.grad_W[i][j]
-            for i in range(layer.b.shape[0]):
-                layer.b[i] = layer.b[i] - self.lr * layer.grad_b[i]
-
+            layer.W -= self.lr * layer.grad_W
+            layer.b -= self.lr * layer.grad_b
 
 
 class Momentum:

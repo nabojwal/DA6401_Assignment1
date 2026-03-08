@@ -1,10 +1,10 @@
 
 import numpy as np
 import wandb
-from src.ann.neural_layer import NeuralLayer
-from src.ann.activations import ReLU, Sigmoid, Tanh
-from src.ann.objective_functions import CrossEntropyLoss, MSELoss
-from src.ann.optimizers import SGD, Momentum, NAG, RMSProp, Adam, Nadam
+from .neural_layer import NeuralLayer
+from .activations import ReLU, Sigmoid, Tanh
+from .objective_functions import CrossEntropyLoss, MSELoss
+from .optimizers import SGD, Momentum, NAG, RMSProp, Adam, Nadam
 
 class NeuralNetwork:
     """
@@ -88,12 +88,6 @@ class NeuralNetwork:
         for i in range(len(self.layers) - 1):
             out = self.layers[i].forward(out)
             out = self.activations[i].forward(out)
-            # activation dist.for 1st hidden layer
-            # if i == 0:
-            #     wandb.log({
-            #         "layer1_activation_mean": np.mean(out),
-            #         "layer1_activation_zero_fraction": np.mean(out == 0)
-            #     })
         logits = self.layers[-1].forward(out)
 
         return logits
@@ -101,13 +95,27 @@ class NeuralNetwork:
     def backward(self, y_true, logits):
         loss = self.loss_function.forward(logits, y_true)
         grad = self.loss_function.backward()
+
+        grad_W_list = []
+        grad_b_list = []
         grad = self.layers[-1].backward(grad, self.weight_decay)
+        grad_W_list.append(self.layers[-1].grad_W)
+        grad_b_list.append(self.layers[-1].grad_b)
+
         for i in reversed(range(len(self.layers) - 1)):
             grad = self.activations[i].backward(grad)
             grad = self.layers[i].backward(grad, self.weight_decay)
-
-        return loss  
-
+            
+            grad_W_list.append(self.layers[i].grad_W)
+            grad_b_list.append(self.layers[i].grad_b)
+        self.grad_W = np.empty(len(grad_W_list), dtype=object)
+        self.grad_b = np.empty(len(grad_b_list), dtype=object)
+        
+        for i, (gw, gb) in enumerate(zip(grad_W_list, grad_b_list)):
+            self.grad_W[i] = gw
+            self.grad_b[i] = gb
+        return self.grad_W, self.grad_b
+ 
     def update_weights(self):
 
         self.optimizer.step()
@@ -118,9 +126,7 @@ class NeuralNetwork:
             "train_loss": [],
             "train_accuracy": []
         }
-
         N = X_train.shape[0]
-
         for epoch in range(epochs):
 
             indices = np.random.permutation(N)
@@ -133,26 +139,10 @@ class NeuralNetwork:
 
                 X_batch = X_train[i:i+batch_size]
                 y_batch = y_train[i:i+batch_size]
-
                 logits = self.forward(X_batch)
-                loss= self.backward(y_batch, logits)
-
-                # # gradient norm of first hidden layer
-                # grad_norm = np.linalg.norm(self.layers[0].grad_W)
-
-                # wandb.log({
-                #     "grad_norm_layer1": grad_norm
-                # })
-                # g = self.layers[0].grad_W
-                # wandb.log({
-                #     "grad_neuron_1": g[0,0],
-                #     "grad_neuron_2": g[0,1],
-                #     "grad_neuron_3": g[0,2],
-                #     "grad_neuron_4": g[0,3],
-                #     "grad_neuron_5": g[0,4]
-                # })
+                _ = self.backward(y_batch, logits) 
+                loss = self.loss_function.forward(logits, y_batch)
                 self.update_weights()
-
                 total_loss += loss
 
             avg_loss = total_loss / (N // batch_size)
@@ -161,6 +151,7 @@ class NeuralNetwork:
 
             history["train_loss"].append(avg_loss)
             history["train_accuracy"].append(acc)
+            
 
             print(f"Epoch {epoch+1}/{epochs}, Loss: {avg_loss:.4f}, Acc: {acc:.4f}")
 
@@ -180,3 +171,18 @@ class NeuralNetwork:
 
         return loss, accuracy
     
+    def get_weights(self):
+        d = {}
+        for i, layer in enumerate(self.layers):
+            d[f"W{i}"] = layer.W.copy()
+            d[f"b{i}"] = layer.b.copy()
+        return d
+
+    def set_weights(self, weight_dict):
+        for i, layer in enumerate(self.layers):
+            w_key = f"W{i}"
+            b_key = f"b{i}"
+            if w_key in weight_dict:
+                layer.W = weight_dict[w_key].copy()
+            if b_key in weight_dict:
+                layer.b = weight_dict[b_key].copy()

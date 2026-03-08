@@ -25,11 +25,16 @@ class NeuralLayer:
         if weight_init == "xavier":
             limit = np.sqrt(2.0 / (input_dim + output_dim))
             self.W = np.random.randn(input_dim, output_dim) * limit
+            self.b = np.zeros((1, output_dim))
+
         elif weight_init == "zeros":
             self.W = np.zeros((input_dim, output_dim))
             self.b = np.zeros((1, output_dim))
+
         elif weight_init == "random":
             self.W = np.random.randn(input_dim, output_dim) * 0.01
+            self.b = np.zeros((1, output_dim))
+
         else:
             raise ValueError("Unsupported weight initialization method")
 
@@ -66,18 +71,10 @@ class NeuralLayer:
             grad_b = sum(dZ)
             dA_prev = dZ @ W^T
         """
-
         
-        self.grad_W = self.A_prev.T @ dZ
-
-        
+        self.grad_W =( self.A_prev.T @ dZ )     
         if weight_decay > 0:
-            self.grad_W += weight_decay * self.W
-
-        
-        self.grad_b = np.sum(dZ, axis=0, keepdims=True)
-
-        
+            self.grad_W += weight_decay * self.W        
+        self.grad_b = np.sum(dZ, axis=0) 
         dA_prev = dZ @ self.W.T
-
         return dA_prev
