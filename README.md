@@ -7,7 +7,7 @@ All core components are built manually, including layers, activation functions, 
 The model is trained and evaluated on the **MNIST** and **Fashion-MNIST** datasets.
 ## W&B Report
 Link to W&B Report Part 1:  
-[View the experiment report](https://wandb.ai/your-username/project-name/reports/your-report)
+[View the experiment report](https://wandb.ai/nabojwal_dl1/da6401_assignment_1/reports/DA6401-Assignment-1-Report-Part-1--VmlldzoxNjExMDM0MA)
 
 Link to W&B Report Part 2:  
 [View the experiment report](https://wandb.ai/your-username/project-name/reports/your-report)
@@ -18,6 +18,7 @@ Link to GitHub Repository:
 [https://github.com/nabojwal/DA6401_Assignment1](https://github.com/nabojwal/DA6401_Assignment1)
 
 ## Thank You!
+
 
 
 
