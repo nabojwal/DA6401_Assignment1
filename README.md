@@ -42,9 +42,10 @@ Link to W&B Report:
 ## Train on MNIST 
 Run the following command for training with the best hyperparameters.
 ```markdown
-```
+```bash
 python src/train.py --dataset mnist --epochs 10 --batch_size 64 --learning_rate 0.001 --optimizer adam --num_layers 3 --hidden_size 128 128 128 --activation relu --loss cross_entropy --weight_init xavier
 ```
+
 
 
 
