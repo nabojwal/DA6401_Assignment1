@@ -8,6 +8,7 @@ The model is trained and evaluated on the **MNIST** and **Fashion-MNIST** datase
 ## W&B Report
 Link to W&B Report Part 1:  
 [View the experiment report](https://wandb.ai/your-username/project-name/reports/your-report)
+
 Link to W&B Report Part 2:  
 [View the experiment report](https://wandb.ai/your-username/project-name/reports/your-report)
 
@@ -17,5 +18,6 @@ Link to GitHub Repository:
 [https://github.com/nabojwal/DA6401_Assignment1](https://github.com/nabojwal/DA6401_Assignment1)
 
 ## Thank You!
+
 
 
