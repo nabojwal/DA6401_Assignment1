@@ -21,7 +21,7 @@ Link to W&B Report:
 │   │   ├── neural_layer.py         # Linear layer (Z = WA + b)
 │   │   ├── neural_network.py       # Orchestrator (forward/backward/train)
 │   │   ├── objective_functions.py  # Loss functions (CrossEntropy, MSE)
-│   │   └── optimizers.py           # Adam, SGD, Momentum, Nadam, RMSProp
+│   │   └── optimizers.py           # Adam, SGD, Momentum, Nadam, NAG, and RMSProp
 │   │
 │   ├── utils/                      # Helper modules
 │   │   ├── __init__.py
@@ -40,6 +40,7 @@ Link to W&B Report:
 ```
 
 ## Thank You!
+
 
 
 
